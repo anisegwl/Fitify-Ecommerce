@@ -25,7 +25,7 @@ const reducer = (state, action) => {
 
       const idx = state.cart.findIndex((c) => c._id === item._id);
 
-      // already in cart => increase qty
+
       if (idx !== -1) {
         const updated = [...state.cart];
         updated[idx] = { ...updated[idx], qty: (updated[idx].qty || 1) + qtyToAdd };
