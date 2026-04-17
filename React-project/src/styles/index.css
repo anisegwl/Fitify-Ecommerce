@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #111827;
+  --primary-hover: #1f2937;
+  --accent: #dc2626;
+  --accent-hover: #b91c1c;
+  --bg-main: #f8fafc;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Custom Utilities if needed */
+.bg-brand-primary { background-color: var(--primary); }
+.bg-brand-accent { background-color: var(--accent); }
+.rounded-brand-xl { border-radius: var(--radius-xl); }
+.rounded-brand-2xl { border-radius: var(--radius-2xl); }
