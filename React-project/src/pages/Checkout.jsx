@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ProductContext from "../../context/product/ProductContext";
+import ProductContext from "../context/product/ProductContext";
 import { toast } from "react-toastify";
 
 const API_BASE = "http://localhost:5000";

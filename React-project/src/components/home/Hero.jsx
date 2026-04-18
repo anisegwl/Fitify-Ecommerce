@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import image from '../../assets/gymcarousel.webp';
+import image from '@/assets/images/marketing/gymcarousel.webp';
 
 const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false);

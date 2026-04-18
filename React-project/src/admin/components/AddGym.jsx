@@ -5,8 +5,6 @@ import { FaImage, FaTimes, FaUpload, FaLink } from "react-icons/fa";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 
-// ✅ Defined OUTSIDE AddGym so it keeps a stable identity across re-renders
-// If defined inside, React unmounts/remounts it on every keystroke, losing focus
 const Field = ({ label, name, value, onChange, type = "text", placeholder, min, max, step, error }) => (
   <div>
     <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
@@ -20,7 +18,7 @@ const Field = ({ label, name, value, onChange, type = "text", placeholder, min, 
       max={max}
       step={step}
       className={`w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 ${
-        error ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-green-500"
+        error ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-gray-500"
       }`}
     />
     {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
@@ -36,41 +34,66 @@ const EMPTY_GYM = {
   threeMonths: "",
   sixMonths: "",
   oneYear: "",
-  image: null,
 };
 
 const AddGym = ({ onSuccess }) => {
   const [gym, setGym] = useState(EMPTY_GYM);
   const [loading, setLoading] = useState(false);
-  const [imageMode, setImageMode] = useState("upload"); // "upload" | "url"
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
-  const [fileName, setFileName] = useState("");
+  const [mainImageMode, setMainImageMode] = useState("upload");
+  const [mainFile, setMainFile] = useState(null);
+  const [mainPreview, setMainPreview] = useState(null);
+  const [mainUrl, setMainUrl] = useState("");
+  const [mainFileName, setMainFileName] = useState("");
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const [galleryUrlText, setGalleryUrlText] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    setFieldErrors((p) => ({ ...p, [name]: "" }));
+  const readImagePreview = (file, onData) => {
+    const reader = new FileReader();
+    reader.onloadend = () => onData(reader.result);
+    reader.readAsDataURL(file);
+  };
 
-    if (type === "file") {
-      const file = files?.[0];
-      if (!file) return;
-      if (!file.type.startsWith("image/")) {
-        setFieldErrors((p) => ({ ...p, image: "Please upload an image file" }));
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setFieldErrors((p) => ({ ...p, image: "Image must be less than 5MB" }));
-        return;
-      }
-      setGym((p) => ({ ...p, image: file }));
-      setFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFieldErrors((p) => ({ ...p, [name]: "" }));
+    setGym((p) => ({ ...p, [name]: value }));
+  };
+
+  const handleMainFile = (e) => {
+    const file = e.target.files?.[0];
+    setFieldErrors((p) => ({ ...p, mainImage: "" }));
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setFieldErrors((p) => ({ ...p, mainImage: "Please upload an image file" }));
       return;
     }
-    setGym((p) => ({ ...p, [name]: value }));
+    if (file.size > 5 * 1024 * 1024) {
+      setFieldErrors((p) => ({ ...p, mainImage: "Image must be less than 5MB" }));
+      return;
+    }
+    setMainFile(file);
+    setMainFileName(file.name);
+    readImagePreview(file, setMainPreview);
+  };
+
+  const handleGalleryFiles = (e) => {
+    const picked = Array.from(e.target.files || []);
+    e.target.value = "";
+    const next = [];
+    for (const file of picked) {
+      if (!file.type.startsWith("image/")) continue;
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Each gallery image must be under 5MB");
+        continue;
+      }
+      next.push(file);
+    }
+    if (next.length) setGalleryFiles((p) => [...p, ...next]);
+  };
+
+  const removeGalleryFile = (idx) => {
+    setGalleryFiles((p) => p.filter((_, i) => i !== idx));
   };
 
   const validate = () => {
@@ -96,33 +119,33 @@ const AddGym = ({ onSuccess }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const clearImage = () => {
-    setGym((p) => ({ ...p, image: null }));
-    setImagePreview(null);
-    setFileName("");
-    setImageUrl("");
-    setFieldErrors((p) => ({ ...p, image: "" }));
+  const clearMainImage = () => {
+    setMainFile(null);
+    setMainPreview(null);
+    setMainFileName("");
+    setMainUrl("");
+    setFieldErrors((p) => ({ ...p, mainImage: "" }));
   };
 
-  const handleImageUrlChange = (e) => {
+  const handleMainUrlChange = (e) => {
     const url = e.target.value;
-    setImageUrl(url);
-    setImagePreview(url || null);
-    setFieldErrors((p) => ({ ...p, image: "" }));
+    setMainUrl(url);
+    setMainPreview(url || null);
+    setFieldErrors((p) => ({ ...p, mainImage: "" }));
   };
 
-  const switchMode = (mode) => {
-    setImageMode(mode);
-    clearImage();
+  const switchMainMode = (mode) => {
+    setMainImageMode(mode);
+    clearMainImage();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    if (!validate()) { toast.error("❌ Fix form errors first"); return; }
+    if (!validate()) { toast.error(" Fix form errors first"); return; }
 
     const token = localStorage.getItem("token");
-    if (!token) { toast.error("❌ Token missing. Login again as admin."); return; }
+    if (!token) { toast.error(" Token missing. Login again as admin."); return; }
 
     try {
       setLoading(true);
@@ -135,37 +158,43 @@ const AddGym = ({ onSuccess }) => {
       formData.append("membership[threeMonths]", String(gym.threeMonths));
       formData.append("membership[sixMonths]", String(gym.sixMonths));
       formData.append("membership[oneYear]", String(gym.oneYear));
-      // Image: file takes priority, then URL
-      if (imageMode === "upload" && gym.image) {
-        formData.append("myfile", gym.image);
-      } else if (imageMode === "url" && imageUrl.trim()) {
-        formData.append("imageUrl", imageUrl.trim());
+      if (mainImageMode === "upload" && mainFile) {
+        formData.append("mainfile", mainFile);
+      } else if (mainImageMode === "url" && mainUrl.trim()) {
+        formData.append("mainImageUrl", mainUrl.trim());
       }
+      const extraUrls = galleryUrlText
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      formData.append("galleryUrls", JSON.stringify(extraUrls));
+      galleryFiles.forEach((file) => formData.append("gallery", file));
 
       const res = await axios.post(`${API_BASE}/api/gyms/addgym`, formData, {
         headers: { "auth-token": token },
         timeout: 15000,
       });
 
-      toast.success("✅ Gym added!");
+      toast.success("Gym added!");
       onSuccess?.(res.data);
       setGym(EMPTY_GYM);
-      setImagePreview(null);
-      setFileName("");
-      setImageUrl("");
+      clearMainImage();
+      setGalleryFiles([]);
+      setGalleryUrlText("");
+      setMainImageMode("upload");
       setFieldErrors({});
     } catch (err) {
       console.error("AddGym error:", err);
       const apiErrors = err?.response?.data?.errors;
       if (Array.isArray(apiErrors) && apiErrors.length > 0) {
-        toast.error(`❌ ${apiErrors.map((e) => e.msg).join(", ")}`);
+        toast.error(`${apiErrors.map((e) => e.msg).join(", ")}`);
         return;
       }
       const msg =
         err?.response?.data?.message ||
         (err?.response?.status === 401 ? "Invalid token (login again)" : "") ||
         (err.code === "ECONNABORTED" ? "Request timeout." : "Failed to add gym.");
-      toast.error(`❌ ${msg}`);
+      toast.error(`${msg}`);
     } finally {
       setLoading(false);
     }
@@ -173,16 +202,15 @@ const AddGym = ({ onSuccess }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="px-6 py-4" style={{ background: "linear-gradient(135deg, #065f46, #047857)" }}>
-        <h3 className="text-xl font-bold text-white">🏋️ Add New Gym</h3>
-        <p className="text-sm text-green-100 mt-1">Admin only</p>
+      <div className="bg-gray-900 px-6 py-4" >
+        <h3 className="text-xl font-bold text-white"> Add New Gym</h3>
       </div>
 
       <div className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Row 1: Name + Location */}
+         
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Field label="Gym Name *" name="name" value={gym.name} onChange={handleChange} placeholder="e.g. FitZone Elite" error={fieldErrors.name} />
+            <Field label="Gym Name *" name="name" value={gym.name} onChange={handleChange} error={fieldErrors.name} />
             <Field label="Location *" name="location" value={gym.location} onChange={handleChange} placeholder="e.g. Kathmandu, Baneshwor" error={fieldErrors.location} />
           </div>
 
@@ -196,7 +224,7 @@ const AddGym = ({ onSuccess }) => {
               rows={3}
               placeholder="Describe the gym facilities, equipment, trainers..."
               className={`w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 ${
-                fieldErrors.description ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-green-500"
+                fieldErrors.description ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-gray-500"
               }`}
             />
             {fieldErrors.description && <p className="mt-1 text-sm text-red-600">{fieldErrors.description}</p>}
@@ -216,55 +244,54 @@ const AddGym = ({ onSuccess }) => {
             </div>
           </div>
 
-          {/* Image Section */}
+          {/* Main / cover image */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Gym Image</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Main cover image</label>
+            <p className="text-xs text-gray-500 mb-3">Used on gym cards and at the top of the gym detail page.</p>
 
-            {/* Mode Toggle */}
             <div className="flex rounded-xl border border-gray-200 overflow-hidden mb-4 w-fit">
               <button
                 type="button"
-                onClick={() => switchMode("upload")}
+                onClick={() => switchMainMode("upload")}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
-                  imageMode === "upload"
-                    ? "bg-green-700 text-white"
+                  mainImageMode === "upload"
+                    ? "bg-gray-900 text-white"
                     : "bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                <FaUpload className="text-xs" /> Upload File
+                <FaUpload className="text-xs" /> Upload
               </button>
               <button
                 type="button"
-                onClick={() => switchMode("url")}
+                onClick={() => switchMainMode("url")}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
-                  imageMode === "url"
-                    ? "bg-green-700 text-white"
+                  mainImageMode === "url"
+                    ? "bg-gray-900 text-white"
                     : "bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                <FaLink className="text-xs" /> Image URL
+                <FaLink className="text-xs" /> URL
               </button>
             </div>
 
-            {/* URL Mode */}
-            {imageMode === "url" && (
+            {mainImageMode === "url" && (
               <div className="space-y-3">
                 <input
                   type="text"
-                  value={imageUrl}
-                  onChange={handleImageUrlChange}
-                  placeholder="https://example.com/gym-image.jpg"
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  value={mainUrl}
+                  onChange={handleMainUrlChange}
+                  placeholder="https://example.com/cover.jpg"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                 />
-                {imagePreview && (
+                {mainPreview && (
                   <div className="relative">
                     <img
-                      src={imagePreview}
-                      alt="URL Preview"
-                      onError={() => setImagePreview(null)}
+                      src={mainPreview}
+                      alt="Preview"
+                      onError={() => setMainPreview(null)}
                       className="w-full h-48 object-cover rounded-2xl border border-gray-100"
                     />
-                    <button type="button" onClick={clearImage} className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow">
+                    <button type="button" onClick={clearMainImage} className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow">
                       <FaTimes />
                     </button>
                   </div>
@@ -272,36 +299,82 @@ const AddGym = ({ onSuccess }) => {
               </div>
             )}
 
-            {/* Upload Mode */}
-            {imageMode === "upload" && (
-              !imagePreview ? (
+            {mainImageMode === "upload" && (
+              !mainPreview ? (
                 <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center">
                   <FaImage className="text-gray-400 text-4xl mx-auto mb-3" />
                   <label className="cursor-pointer inline-block">
-                    <span className="px-6 py-2 rounded-xl font-semibold text-white hover:opacity-90 transition" style={{ background: "#047857" }}>
-                      Choose Image
+                    <span className="px-6 py-2 rounded-xl font-semibold text-white hover:opacity-90 transition bg-gray-900">
+                      Choose cover image
                     </span>
-                    <input type="file" accept="image/*" onChange={handleChange} className="hidden" />
+                    <input type="file" accept="image/*" onChange={handleMainFile} className="hidden" />
                   </label>
-                  {fieldErrors.image && <p className="mt-2 text-sm text-red-600">{fieldErrors.image}</p>}
+                  {fieldErrors.mainImage && <p className="mt-2 text-sm text-red-600">{fieldErrors.mainImage}</p>}
                 </div>
               ) : (
                 <div className="relative">
-                  <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover rounded-2xl border border-gray-100" />
-                  <button type="button" onClick={clearImage} className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow" title="Remove image">
+                  <img src={mainPreview} alt="Preview" className="w-full h-64 object-cover rounded-2xl border border-gray-100" />
+                  <button type="button" onClick={clearMainImage} className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow" title="Remove">
                     <FaTimes />
                   </button>
-                  <div className="mt-2 text-sm text-gray-600">📄 {fileName}</div>
+                  <div className="mt-2 text-sm text-gray-600">📄 {mainFileName}</div>
                 </div>
               )
             )}
           </div>
 
+          {/* Gallery */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Gym gallery (optional)</label>
+            <p className="text-xs text-gray-500 mb-3">Extra photos appear on the gym detail page in a gallery (below highlights).</p>
+
+            <div className="border-2 border-dashed border-gray-200 rounded-2xl p-4 mb-4">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gray-900">
+                <FaUpload className="text-xs" />
+                Add photos
+                <input type="file" accept="image/*" multiple onChange={handleGalleryFiles} className="hidden" />
+              </label>
+              {galleryFiles.length > 0 && (
+                <ul className="mt-3 space-y-2 text-sm text-gray-700">
+                  {galleryFiles.map((f, i) => (
+                    <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                      <span className="truncate">{f.name}</span>
+                      <button type="button" onClick={() => removeGalleryFile(i)} className="text-red-600 font-semibold shrink-0">
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Or paste image URLs (one per line)</label>
+              <textarea
+                value={galleryUrlText}
+                onChange={(e) => setGalleryUrlText(e.target.value)}
+                rows={3}
+                
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-gray-500"
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl py-3 font-semibold text-white transition"
-            style={{ background: loading ? "#9ca3af" : "#047857", cursor: loading ? "not-allowed" : "pointer" }}
+            className="w-full rounded-xl py-3 font-semibold text-white transition
+            bg-gray-900
+            hover:bg-gray-800
+            active:scale-95
+            shadow-lg
+            hover:shadow-xl
+            transition-all
+            duration-200
+            flex
+            items-center
+            justify-center
+            gap-2"
           >
             {loading ? "Adding..." : "Add Gym"}
           </button>

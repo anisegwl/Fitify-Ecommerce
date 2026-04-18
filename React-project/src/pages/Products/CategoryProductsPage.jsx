@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useContext } from "react";
-import ProductContext from "../../../context/product/ProductContext";
-import UserProductCard from "../../common/ProductCard";
+import ProductContext from "../../context/product/ProductContext";
+import UserProductCard from "../../components/common/ProductCard";
 import { toast } from "react-toastify";
 
 const CategoryProductsPage = ({

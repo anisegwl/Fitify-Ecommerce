@@ -8,27 +8,27 @@ import Header from "./components/layout/Header";
 import Navbar from "./components/Navbar";
 
 // Pages
-import Home from "./components/pages/Home";
-import Contact from "./components/pages/Static/Contact";
-import Login from "./components/pages/Login";
-import Signup from "./components/pages/Signup";
-import CartItems from "./components/pages/CartItems";
-import Payment from "./components/pages/Payment";
-import SearchResult from "./components/pages/SearchResult";
-import WomenProducts from "./components/pages/Products/WomenProducts";
-import MenProducts from "./components/pages/Products/MenProducts";
-import Profile from "./components/pages/Profile";
-import Supplements from "./components/pages/Products/Supplements";
-import Accsessories from "./components/pages/Products/Accsessories";
-import Checkout from "./components/pages/Checkout";
-import OrderSuccess from "./components/pages/OrderSuccess";
-import ProductDetails from "./components/pages/ProductDetails";
-import Wishlist from "./components/pages/Wishlist";
-import Gyms from "./components/pages/Gyms";
-import GymDetails from "./components/pages/GymDetails";
-import GymBooking from "./components/pages/GymBooking";
-import GymBookingSuccess from "./components/pages/GymBookingSuccess";
-import MyGymBookings from "./components/pages/MyGymBookings";
+import Home from "./pages/Home";
+import Contact from "./pages/Static/Contact";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import CartItems from "./pages/CartItems";
+import Payment from "./pages/Payment";
+import SearchResult from "./pages/SearchResult";
+import WomenProducts from "./pages/Products/WomenProducts";
+import MenProducts from "./pages/Products/MenProducts";
+import Profile from "./pages/Profile";
+import Supplements from "./pages/Products/Supplements";
+import Accsessories from "./pages/Products/Accsessories";
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
+import ProductDetails from "./pages/ProductDetails";
+import Wishlist from "./pages/Wishlist";
+import Gyms from "./pages/Gyms";
+import GymDetails from "./pages/GymDetails";
+import GymBooking from "./pages/GymBooking";
+import GymBookingSuccess from "./pages/GymBookingSuccess";
+import MyGymBookings from "./pages/MyGymBookings";
 // Admin
 import AdminRoutes from "./admin/AdminRoutes";
 
@@ -37,7 +37,7 @@ import ProductState from "./context/product/ProductState";
 import UserState from "./context/user/Userstate";
 import { AuthProvider } from "./context/auth/AuthContext";
 import WishlistState from "./context/wishlist/WishlistState";
-import MyOrders from "./components/pages/MyOrders";
+import MyOrders from "./pages/MyOrders";
 
 // Wrapper
 const AppWrapper = () => {

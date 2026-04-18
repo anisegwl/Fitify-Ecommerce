@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ProductContext from "../../context/product/ProductContext";
-import WishlistContext from "../../context/wishlist/WishlistContext";
+import ProductContext from "../context/product/ProductContext";
+import WishlistContext from "../context/wishlist/WishlistContext";
 import { toast } from "react-toastify";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 

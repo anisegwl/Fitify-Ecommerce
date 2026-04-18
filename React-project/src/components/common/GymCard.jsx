@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaMapMarkerAlt, FaStar, FaDumbbell } from "react-icons/fa";
+import { getGymMainImage } from "../../utils/gymImages";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 const defaultImage = "https://via.placeholder.com/400x250.png?text=No+Image";
@@ -10,6 +11,7 @@ const resolveImage = (src) =>
   src?.startsWith("http") ? src : `${API_BASE}${src}`;
 
 const GymCard = ({ gym }) => {
+  const cover = getGymMainImage(gym);
   const rating = Number(gym.rating) || 0;
   const lowestPrice = gym.membership
     ? Math.min(
@@ -25,7 +27,7 @@ const GymCard = ({ gym }) => {
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={gym.image?.length ? resolveImage(gym.image[0]) : defaultImage}
+          src={cover ? resolveImage(cover) : defaultImage}
           alt={gym.name}
           onError={(e) => (e.currentTarget.src = defaultImage)}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"

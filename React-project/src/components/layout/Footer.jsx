@@ -62,19 +62,19 @@ const Footer = () => {
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start">
                   <i className="fas fa-map-marker-alt mt-1 mr-3 text-blue-500"></i>
-                  <span>Irving 2194 USA</span>
+                  <span>Kathmandu,Nepal</span>
                 </li>
                 <li className="flex items-start">
                   <i className="fas fa-phone-alt mt-1 mr-3 text-blue-500"></i>
-                  <span>0478 517 210</span>
+                  <span>+977 9843773343</span>
                 </li>
                 <li className="flex items-start">
                   <i className="fas fa-envelope mt-1 mr-3 text-blue-500"></i>
-                  <span>uoit-msar@gmail.com</span>
+                  <span>fitifycom@gmail.com</span>
                 </li>
                 <li className="flex items-start">
                   <i className="fas fa-id-card mt-1 mr-3 text-blue-500"></i>
-                  <span>ABN: 30 628 513 20</span>
+                  <span>PAN : 2309458485940 </span>
                 </li>
               </ul>
               

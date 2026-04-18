@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import specialEdition from '../assets/empty-gym.webp';
+import specialEdition from '@/assets/images/marketing/empty-gym.webp';
 
 const Card = () => {
   const [imageLoaded, setImageLoaded] = useState(false);

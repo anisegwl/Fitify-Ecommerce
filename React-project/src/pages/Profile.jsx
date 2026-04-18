@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import UserContext from "../../context/user/UserContext";
+import UserContext from "../context/user/UserContext";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 

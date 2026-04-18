@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import GymCard from "../common/GymCard";
+import GymCard from "../components/common/GymCard";
 import { FaDumbbell, FaSearch, FaStar } from "react-icons/fa";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";

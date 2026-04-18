@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { FaArrowRightLong } from "react-icons/fa6";
- import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 
-import image1 from "../../assets/esewa.webp";
-import image2 from "../../assets/khalti.webp";
-import image3 from "../../assets/cod.webp";
-import image4 from "../../assets/card.jpg";
+import image1 from "@/assets/images/payment/esewa.webp";
+import image2 from "@/assets/images/payment/khalti.webp";
+import image3 from "@/assets/images/payment/cod.webp";
+import image4 from "@/assets/images/payment/card.jpg";
 
 const Payment = () => {
   const [selectedId, setSelectedId] = useState(null);

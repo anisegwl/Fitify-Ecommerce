@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import EditGymModal from "../components/EditGymModal.jsx";
 import AddGym from "../components/AddGym";
 import { FaEdit, FaTrash, FaDumbbell, FaExclamationTriangle, FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import { getGymMainImage } from "../../utils/gymImages";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 const defaultImage = "https://via.placeholder.com/100x100.png?text=No+Image";
@@ -96,8 +97,8 @@ const AdminGyms = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4" style={{ background: "linear-gradient(135deg, #065f46, #047857)" }}>
-            <h2 className="text-2xl font-bold text-white">🏋️ Manage Gyms</h2>
+          <div className="px-6 py-4 bg-gray-900">
+            <h2 className="text-2xl font-bold text-white"> Manage Gyms</h2>
           </div>
 
           {error && (
@@ -146,7 +147,7 @@ const AdminGyms = () => {
                     <tr key={gym._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <img
-                          src={gym.image?.length ? resolveImage(gym.image[0]) : defaultImage}
+                          src={getGymMainImage(gym) ? resolveImage(getGymMainImage(gym)) : defaultImage}
                           alt={gym.name}
                           onError={(e) => (e.currentTarget.src = defaultImage)}
                           className="w-16 h-16 object-cover rounded-lg shadow-sm"
@@ -175,8 +176,18 @@ const AdminGyms = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setEditingGym(gym)}
-                            className="inline-flex items-center gap-2 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md"
-                            style={{ background: "#047857" }}
+                            className="inline-flex items-center gap-2 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md
+                            bg-gray-900
+                            hover:bg-gray-800
+                            active:scale-95
+                            shadow-lg
+                            hover:shadow-xl
+                            transition-all
+                            duration-200
+                            flex
+                            items-center
+                            justify-center
+                            gap-2"
                           >
                             <FaEdit /> Edit
                           </button>

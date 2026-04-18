@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import ProductContext from "../../context/product/ProductContext";
-import ProductCard from "../common/ProductCard";
+import ProductContext from "../context/product/ProductContext";
+import ProductCard from "../components/common/ProductCard";
 import { toast } from "react-toastify";
 
 const SearchResult = () => {

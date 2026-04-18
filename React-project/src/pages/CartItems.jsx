@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import ProductContext from "../../context/product/ProductContext";
+import ProductContext from "../context/product/ProductContext";
 import { Link } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000";

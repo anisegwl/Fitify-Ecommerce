@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import specialEdition from '../../assets/special.jpg';
+import specialEdition from '@/assets/images/marketing/special.jpg';
 
 const Banner = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Preload image
   useEffect(() => {
     const img = new Image();
     img.src = specialEdition;
@@ -18,9 +17,9 @@ const Banner = () => {
 
   const handleLearnMore = () => {
     try {
-      // Add your navigation logic here
+      
       console.log('Navigating to Special Edition page');
-      // Example: navigate('/special-edition') or window.location.href = '/special-edition'
+   
     } catch (err) {
       console.error('Navigation error:', err);
       alert('Unable to navigate. Please try again.');
@@ -61,7 +60,6 @@ const Banner = () => {
             />
           </div>
 
-          {/* Text Section - Right on desktop */}
           <div className="flex items-center min-h-[400px] p-8 md:p-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

@@ -1,12 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { FaMapMarkerAlt, FaStar, FaDumbbell, FaCheckCircle, FaArrowLeft } from "react-icons/fa";
+import {
+  FaMapMarkerAlt,
+  FaStar,
+  FaDumbbell,
+  FaCheckCircle,
+  FaArrowLeft,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+} from "react-icons/fa";
+import { getGymGallery, getGymMainImage } from "../utils/gymImages";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 const defaultImage = "https://via.placeholder.com/800x500.png?text=No+Image";
 
-const resolveImage = (src) => src?.startsWith("http") ? src : `${API_BASE}${src}`;
+const resolveImage = (src) => (src?.startsWith("http") ? src : `${API_BASE}${src}`);
 
 const GymDetails = () => {
   const { id } = useParams();
@@ -14,6 +24,7 @@ const GymDetails = () => {
   const [gym, setGym] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     const fetchGym = async () => {
@@ -30,6 +41,38 @@ const GymDetails = () => {
     };
     fetchGym();
   }, [id]);
+
+  const galleryImgs = useMemo(() => (gym ? getGymGallery(gym) : []), [gym]);
+  const heroSrc = useMemo(() => {
+    if (!gym) return "";
+    const m = getGymMainImage(gym);
+    const g = getGymGallery(gym);
+    return m || g[0] || "";
+  }, [gym]);
+
+  const openLightbox = useCallback((index) => setLightboxIndex(index), []);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const goPrev = useCallback(() => {
+    setLightboxIndex((i) => (i === null || i <= 0 ? i : i - 1));
+  }, []);
+  const goNext = useCallback(() => {
+    setLightboxIndex((i) => {
+      if (i === null) return i;
+      const last = galleryImgs.length - 1;
+      return i >= last ? i : i + 1;
+    });
+  }, [galleryImgs.length]);
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxIndex, closeLightbox, goPrev, goNext]);
 
   if (loading) {
     return (
@@ -81,7 +124,7 @@ const GymDetails = () => {
           {/* Header Image */}
           <div className="relative h-64 md:h-96">
             <img
-              src={gym.image?.length ? resolveImage(gym.image[0]) : defaultImage}
+              src={heroSrc ? resolveImage(heroSrc) : defaultImage}
               alt={gym.name}
               onError={(e) => (e.currentTarget.src = defaultImage)}
               className="w-full h-full object-cover"
@@ -122,6 +165,32 @@ const GymDetails = () => {
                   <div className="flex items-center gap-2 text-gray-700"><FaCheckCircle className="text-gray-900" /> Welcoming Environment</div>
                 </div>
               </section>
+
+              {galleryImgs.length > 0 && (
+                <section>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Gym photos</h3>
+                  <p className="text-sm text-gray-500 mb-4">Tap an image for a larger view.</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {galleryImgs.map((src, idx) => (
+                      <button
+                        key={`${src}-${idx}`}
+                        type="button"
+                        onClick={() => openLightbox(idx)}
+                        className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 group"
+                      >
+                        <img
+                          src={resolveImage(src)}
+                          alt={`${gym.name} photo ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://via.placeholder.com/400x300?text=Image";
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* Right Sidebar - Pricing */}
@@ -157,6 +226,63 @@ const GymDetails = () => {
           </div>
         </div>
       </div>
+
+      {lightboxIndex !== null && galleryImgs.length > 0 && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image preview"
+          onClick={closeLightbox}
+        >
+          <button
+            type="button"
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 text-white/90 hover:text-white p-2 rounded-full bg-white/10 z-10"
+            aria-label="Close"
+          >
+            <FaTimes size={22} />
+          </button>
+          {galleryImgs.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goPrev();
+                }}
+                disabled={lightboxIndex <= 0}
+                className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 text-white p-3 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 z-10"
+                aria-label="Previous image"
+              >
+                <FaChevronLeft size={24} />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goNext();
+                }}
+                disabled={lightboxIndex >= galleryImgs.length - 1}
+                className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 text-white p-3 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 z-10"
+                aria-label="Next image"
+              >
+                <FaChevronRight size={24} />
+              </button>
+            </>
+          )}
+          <div className="max-w-5xl w-full max-h-[85vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={resolveImage(galleryImgs[lightboxIndex])}
+              alt={`${gym.name} ${lightboxIndex + 1}`}
+              className="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl"
+            />
+            <p className="mt-3 text-white/80 text-sm">
+              {lightboxIndex + 1} / {galleryImgs.length}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
