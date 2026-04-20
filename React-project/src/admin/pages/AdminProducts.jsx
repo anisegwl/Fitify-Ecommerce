@@ -84,16 +84,26 @@ const AdminProducts = () => {
   // IMPORTANT: throw error so modal can keep open
   const handleUpdate = async (updatedData) => {
     try {
-      const token = localStorage.getItem("token"); // ✅ FIXED
+      const token = localStorage.getItem("token");
       if (!token) throw new Error("Token missing. Login again.");
+
+      const formData = new FormData();
+      formData.append("title", updatedData.title);
+      formData.append("description", updatedData.description);
+      formData.append("price", String(updatedData.price));
+      formData.append("discount", String(updatedData.discount || 0));
+      formData.append("instock", String(updatedData.instock));
+      
+      if (updatedData.sizes && updatedData.sizes.length > 0) {
+        formData.append("sizes", JSON.stringify(updatedData.sizes));
+      }
 
       await axios.put(
         `${API_BASE}/api/products/${editingProduct._id}`,
-        updatedData,
+        formData,
         {
           headers: {
             "auth-token": token,
-            "Content-Type": "application/json",
           },
           timeout: 10000,
         }

@@ -45,6 +45,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
 
   const inCartQty = useMemo(() => {
     const found = (cart || []).find((c) => c._id === id);
@@ -103,7 +104,11 @@ const ProductDetails = () => {
       toast.error("❌ Out of stock");
       return;
     }
-    const success = addToCart(product, q);
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+      toast.error("❌ Please select a size");
+      return;
+    }
+    const success = addToCart(product, qty, selectedSize);
     if (success) {
       toast.success("✅ Added to cart");
     }
@@ -250,6 +255,31 @@ const ProductDetails = () => {
                 </div>
               )}
             </div>
+
+            {/* Size Selector */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="mt-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Select Size
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setSelectedSize(size)}
+                      className={`px-4 py-2 rounded-xl border text-sm font-semibold transition ${
+                        selectedSize === size
+                          ? "bg-gray-900 text-white border-gray-900"
+                          : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Qty + Add */}
             <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">

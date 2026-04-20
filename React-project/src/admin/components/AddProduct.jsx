@@ -24,6 +24,14 @@ const AddProduct = ({ onSuccess }) => {
   const [fieldErrors, setFieldErrors] = useState({});
 
   const categories = ["Men", "Women", "Supplements", "Accessories"];
+  const availableSizes = ["S", "M", "L", "XL", "2XL"];
+  const [selectedSizes, setSelectedSizes] = useState([]);
+
+  const handleSizeToggle = (size) => {
+    setSelectedSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+    );
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,6 +150,11 @@ const AddProduct = ({ onSuccess }) => {
         formData.append("imageUrl", imageUrl.trim());
       }
 
+      // Handle sizes
+      if (selectedSizes.length > 0) {
+        formData.append("sizes", JSON.stringify(selectedSizes));
+      }
+
       const res = await axios.post(`${API_BASE}/api/products/addproduct`, formData, {
         headers: {
           "auth-token": token,
@@ -163,6 +176,7 @@ const AddProduct = ({ onSuccess }) => {
       });
       clearImage();
       setImageMode("upload");
+      setSelectedSizes([]);
       setFieldErrors({});
     } catch (err) {
       console.error("AddProduct error:", err);
@@ -328,6 +342,28 @@ const AddProduct = ({ onSuccess }) => {
               {fieldErrors.instock && (
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.instock}</p>
               )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Available Sizes
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {availableSizes.map((size) => (
+                <button
+                  type="button"
+                  key={size}
+                  onClick={() => handleSizeToggle(size)}
+                  className={`px-4 py-2 rounded-xl border text-sm font-semibold transition ${
+                    selectedSizes.includes(size)
+                      ? "bg-gray-900 text-white border-gray-900"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
             </div>
           </div>
 

@@ -96,6 +96,11 @@ const CartItems = () => {
                         <p className="text-sm text-gray-600 mt-1">
                           Rs {money(final)} each
                         </p>
+                        {it.size && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            Size: {it.size}
+                          </p>
+                        )}
                       </div>
 
                       <button

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaTimes, FaSave } from "react-icons/fa";
 
+const availableSizes = ["S", "M", "L", "XL", "2XL"];
+
 const EditProductModal = ({ product, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -10,6 +12,7 @@ const EditProductModal = ({ product, onClose, onSave }) => {
     instock: "",
   });
 
+  const [selectedSizes, setSelectedSizes] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,13 +24,20 @@ const EditProductModal = ({ product, onClose, onSave }) => {
       discount: product?.discount ?? 0,
       instock: product?.instock ?? "",
     });
+    setSelectedSizes(product?.sizes || []);
     setError("");
   }, [product]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target; // ✅ fixed
+    const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
     if (error) setError("");
+  };
+
+  const handleSizeToggle = (size) => {
+    setSelectedSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -39,6 +49,7 @@ const EditProductModal = ({ product, onClose, onSave }) => {
       price: Number(formData.price),
       discount: Number(formData.discount || 0),
       instock: Number(formData.instock),
+      sizes: selectedSizes,
     };
 
     if (!payload.title) return setError("Title is required");
@@ -192,6 +203,30 @@ const EditProductModal = ({ product, onClose, onSave }) => {
                 className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
                 placeholder="0"
               />
+            </div>
+
+            {/* Sizes */}
+            <div className="md:col-span-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Available Sizes
+              </label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {availableSizes.map((size) => (
+                  <button
+                    type="button"
+                    key={size}
+                    onClick={() => handleSizeToggle(size)}
+                    disabled={saving}
+                    className={`px-4 py-2 rounded-xl border text-sm font-semibold transition ${
+                      selectedSizes.includes(size)
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                    } disabled:opacity-60`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

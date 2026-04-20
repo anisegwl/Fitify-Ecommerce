@@ -8,6 +8,7 @@ const productSchema = new Schema({
   instock: { type: Number, required: true },
   discount: { type: Number, required: true },
   image: { type: [String], default: [] },
+  sizes: { type: [String], default: [] },
   category: {
     type: String,
     enum: ["Men", "Women", "Supplements", "Accessories"],

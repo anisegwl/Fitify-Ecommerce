@@ -218,6 +218,14 @@ router.post(
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
+      let imageArray = [];
+      
+      if (req.file) {
+        imageArray = [`/uploads/${req.file.filename}`];
+      } else if (req.body.imageUrl && req.body.imageUrl.trim()) {
+        imageArray = [req.body.imageUrl.trim()];
+      }
+
       const productData = {
         title: req.body.title,
         description: req.body.description,
@@ -225,7 +233,8 @@ router.post(
         discount: Number(req.body.discount || 0),
         instock: Number(req.body.instock),
         category: req.body.category,
-        image: req.file ? [`/uploads/${req.file.filename}`] : [],
+        image: imageArray,
+        sizes: req.body.sizes ? JSON.parse(req.body.sizes) : [],
       };
 
       const product = await Product.create(productData);
@@ -269,6 +278,13 @@ router.put(
       // If new image uploaded
       if (req.file) {
         update.image = [`/uploads/${req.file.filename}`];
+      } else if (req.body.imageUrl && req.body.imageUrl.trim()) {
+        update.image = [req.body.imageUrl.trim()];
+      }
+
+      // Update sizes if provided
+      if (req.body.sizes) {
+        update.sizes = JSON.parse(req.body.sizes);
       }
 
       product = await Product.findByIdAndUpdate(req.params.id, { $set: update }, { new: true });

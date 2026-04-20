@@ -137,7 +137,7 @@ const ProductState = ({ children }) => {
   };
 
   // cart actions
-  const addToCart = (product, qty = 1) => {
+  const addToCart = (product, qty = 1, size = null) => {
     if (!localStorage.getItem("token")) {
       toast.error("Please login to add to cart");
       return false;
@@ -152,6 +152,7 @@ const ProductState = ({ children }) => {
       discount: product.discount ?? 0,
       image: product.image ?? null,
       instock: product.instock ?? product.stock ?? 0,
+      size: size || null,
     };
 
     dispatch({ type: "ADD_TO_CART", payload: cleaned, qty });
