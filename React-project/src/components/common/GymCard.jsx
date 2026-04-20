@@ -24,7 +24,7 @@ const GymCard = ({ gym }) => {
 
   return (
     <Link to={`/gym/${gym._id}`} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col group cursor-pointer">
-      {/* Image */}
+    
       <div className="relative h-48 overflow-hidden">
         <img
           src={cover ? resolveImage(cover) : defaultImage}
@@ -32,7 +32,7 @@ const GymCard = ({ gym }) => {
           onError={(e) => (e.currentTarget.src = defaultImage)}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />
-        {/* Rating badge */}
+        {/* Rating Badge */}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
           <FaStar className="text-yellow-400 text-xs" />
           <span className="text-xs font-bold text-gray-800">{rating.toFixed(1)}</span>
@@ -67,7 +67,7 @@ const GymCard = ({ gym }) => {
           </div>
         )}
 
-        {/* CTA */}
+        
         <div className="mt-4">
           <div className="flex items-center justify-between">
             {lowestPrice !== null && (

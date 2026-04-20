@@ -5,22 +5,22 @@ const categories = [
   {
     name: "Men's Apparel",
     path: "/men-products",
-    image: "https://images.unsplash.com/photo-1581009137142-62cf9b33a215?w=500&q=80",
+    image: "https://imgs.search.brave.com/y7G7wvLFtNJliRxnLAOKZL7oAfF9p88Lr8RgTaEmvGw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NjFFRThleksrckwu/anBn",
   },
   {
     name: "Women's Apparel",
     path: "/women-products",
-    image: "https://images.unsplash.com/photo-1608228088998-57828365d486?w=500&q=80",
+    image: "https://imgs.search.brave.com/MSWyI3Kx8c0MWFwwYdbr7mVxS0dZk3Kt_qD_ZQC8BfM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/c2hvcGlmeS5jb20v/cy9maWxlcy8xLzI2/NjUvMDM0Ni9maWxl/cy8zMjAyNS1XRXNz/ZW50aWFsU2VhbWxl/c3NMU1RlZS1EYXJr/T2FrMDEuanBnP3Y9/MTc3NTgyNjU0MiZ3/aWR0aD02MTEmaGVp/Z2h0PTkxNyZjcm9w/PXRvcA",
   },
   {
     name: "Supplements",
     path: "/supplements",
-    image: "https://images.unsplash.com/photo-1579722820308-d74e571900a9?w=500&q=80",
+    image: "https://imgs.search.brave.com/PIJfJAGY7vTFaYabOT_FPd9-Gx7kXiDINOdnaxnNAmU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pMC53/cC5jb20vcG9zdC5o/ZWFsdGhsaW5lLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/Mi8xMi9wcm90ZWlu/LXBvd2Rlci1zdXBw/bGVtZW50LTEyOTYt/NzI4LWhlYWRlci5q/cGc_dz0xMTU1Jmg9/MTUyOA",
   },
   {
     name: "Accessories",
     path: "/accsessories",
-    image: "https://images.unsplash.com/photo-1584735175315-9d5823ea25e5?w=500&q=80",
+    image: "https://imgs.search.brave.com/Nli-7WOT3qZIrVN3pHw370CUKKseaY5R7bqLB64i3XA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4x/MS5iaWdjb21tZXJj/ZS5jb20vcy16NnZv/bHk2eXU3L2ltYWdl/cy9zdGVuY2lsLzUz/Mng1MzIvcHJvZHVj/dHMvMTY3My8zMDQ2/My9ic3RoYi0yMDI1/LTEwLTMwVDIwLTQy/LTQ4X180MTA4OC4x/NzYyMzU3OTM0Lmpw/Zz9jPTE",
   },
 ];
 

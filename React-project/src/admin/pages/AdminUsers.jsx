@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaTrash, FaUserShield } from "react-icons/fa";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axios.get(`${API_BASE}/api/admin/users`, {
         headers: { "auth-token": token },
       });
       setUsers(res.data);
@@ -30,7 +32,7 @@ const AdminUsers = () => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+      await axios.delete(`${API_BASE}/api/admin/users/${id}`, {
         headers: { "auth-token": token },
       });
       toast.success("User deleted successfully");

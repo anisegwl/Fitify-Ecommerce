@@ -15,9 +15,11 @@ const GymSection = () => {
     const fetchGyms = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API_BASE}/api/gyms`, { timeout: 8000 });
-      
-        setGyms((res.data || []).slice(0, 5));
+        const res = await axios.get(`${API_BASE}/api/gyms?sort=ranking&limit=5`, {
+          timeout: 8000,
+        });
+
+        setGyms(res.data || []);
       } catch (err) {
         console.error("GymSection fetch error:", err);
         setError("Unable to load gyms.");
@@ -33,13 +35,13 @@ const GymSection = () => {
 
   return (
     <section className="py-14 bg-white">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Section Header */}
+      <div className="max-w-7xl mx-auto px-4">
+        
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-1">
               
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
                 Featured Gyms
               </h2>
             </div>
@@ -82,7 +84,7 @@ const GymSection = () => {
               ))}
             </div>
 
-            {/* Mobile View All Button */}
+            
             <div className="sm:hidden mt-6 text-center">
               <Link
                 to="/gyms"

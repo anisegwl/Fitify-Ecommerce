@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
-const API = "http://localhost:5000/api/admin/orders";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API = `${API_BASE}/api/admin/orders`;
 
 const money = (n) => {
   const num = Number(n);

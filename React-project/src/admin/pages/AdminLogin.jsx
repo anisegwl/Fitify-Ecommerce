@@ -5,6 +5,8 @@ import axios from "axios";
 import { useAuth } from "../../context/auth/AuthContext";
 import { FaEnvelope, FaLock, FaShieldAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { login, user } = useAuth();

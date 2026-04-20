@@ -1,23 +1,14 @@
-import React, { useState } from 'react';
-import image from '@/assets/images/marketing/gymcarousel.webp';
+import React from 'react';
+
+const HERO_BG_PRIMARY =
+  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80';
+const HERO_BG_FALLBACK =
+  'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1920&q=80';
 
 const Hero = () => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  // Preload image for better UX
-  React.useEffect(() => {
-    const img = new Image();
-    img.src = image;
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => {
-      console.error('Failed to load hero background image');
-      setImageError(true);
-    };
-  }, []);
-
   const handleShopClick = (e) => {
     try {
-      // Smooth scroll to shop section
+      
       const shopSection = document.querySelector('#shop');
       if (shopSection) {
         shopSection.scrollIntoView({ behavior: 'smooth' });
@@ -30,47 +21,28 @@ const Hero = () => {
   };
 
   return (
-    <section 
-      className="relative min-h-screen flex items-center justify-center text-white text-center bg-gray-900"
+    <section
+      className="relative min-h-screen flex items-center justify-center text-white text-center bg-black"
       style={{
-        backgroundImage: imageError ? 'none' : `url(${image})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0,0.5)), url(${HERO_BG_PRIMARY}), url(${HERO_BG_FALLBACK})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
       }}
     >
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-
-      {/* Loading State */}
-      {!imageLoaded && !imageError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-          <div className="text-white">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mx-auto mb-4"></div>
-            <p>Loading...</p>
-          </div>
-        </div>
-      )}
-
-      {/* Error State */}
-      {imageError && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-10">
-          <p className="text-sm">Failed to load background image</p>
-        </div>
-      )}
-
       {/* Content */}
-      <div className="container mx-auto px-4 relative z-10 max-w-4xl">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold uppercase mb-4 tracking-tight">
+      <div className="container mx-auto px-4 relative z-10 max-w-5xl">
+        <h1 className="text-6xl md:text-7xl lg:text-8xl font-black uppercase mb-6 tracking-wider leading-tight">
           Unleash Your Beast
         </h1>
-        <p className="text-xl md:text-2xl mb-8 text-gray-200">
+        <p className="text-lg md:text-xl lg:text-2xl mb-12 text-gray-100 font-light">
           Engineered for performance. Designed for style.
         </p>
-        <a 
-          href="#shop" 
+        <a
+          href="#shop"
           onClick={handleShopClick}
-          className="inline-block bg-gray-900 hover:bg-gray-800 text-white font-semibold px-10 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg hover:shadow-2xl active:scale-95"
+          className="inline-block bg-white text-black font-bold px-12 py-4 text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl active:scale-95 hover:scale-105"
         >
           Explore Shop
         </a>

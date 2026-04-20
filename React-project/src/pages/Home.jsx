@@ -4,6 +4,7 @@ import Brands from "../components/home/Brands";
 import Features from "../components/home/Features";
 import ShopByCategories from "../components/home/ShopByCategories";
 import OurProduct from "../components/OurProduct";
+import RecommendedProducts from "../components/home/RecommendedProducts";
 import GymSection from "../components/home/GymSection";
 import Banner from "../components/home/Banner";
 import Card from "../components/Card";
@@ -17,6 +18,10 @@ const Home = () => {
       <Brands />
       
       <ShopByCategories />
+
+      <div className="py-2">
+        <RecommendedProducts />
+      </div>
       
       {/* Featured Products */}
       <div className="py-8">

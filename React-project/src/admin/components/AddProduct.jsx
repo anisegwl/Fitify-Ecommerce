@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaImage, FaTimes } from "react-icons/fa";
+import { FaImage, FaTimes, FaUpload, FaLink } from "react-icons/fa";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 
@@ -13,45 +13,64 @@ const AddProduct = ({ onSuccess }) => {
     discount: "",
     instock: "",
     category: "",
-    image: null,
   });
 
   const [loading, setLoading] = useState(false);
+  const [imageMode, setImageMode] = useState("upload");
+  const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [fileName, setFileName] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
 
   const categories = ["Men", "Women", "Supplements", "Accessories"];
 
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-
-    // clear field error as user types
+    const { name, value } = e.target;
     setFieldErrors((p) => ({ ...p, [name]: "" }));
+    setProduct((p) => ({ ...p, [name]: value }));
+  };
 
-    if (type === "file") {
-      const file = files?.[0];
-      if (!file) return;
+  const handleImageFile = (e) => {
+    const file = e.target.files?.[0];
+    setFieldErrors((p) => ({ ...p, image: "" }));
+    if (!file) return;
 
-      if (!file.type.startsWith("image/")) {
-        setFieldErrors((p) => ({ ...p, image: "Please upload an image file" }));
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setFieldErrors((p) => ({ ...p, image: "Image must be less than 5MB" }));
-        return;
-      }
-
-      setProduct((p) => ({ ...p, image: file }));
-      setFileName(file.name);
-
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) {
+      setFieldErrors((p) => ({ ...p, image: "Please upload an image file" }));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setFieldErrors((p) => ({ ...p, image: "Image must be less than 5MB" }));
       return;
     }
 
-    setProduct((p) => ({ ...p, [name]: value }));
+    setImageFile(file);
+    setFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleImageUrlChange = (e) => {
+    const url = e.target.value;
+    setImageUrl(url);
+    setImagePreview(url || null);
+    setFieldErrors((p) => ({ ...p, image: "" }));
+  };
+
+  const switchImageMode = (mode) => {
+    setImageMode(mode);
+    clearImage();
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setFileName("");
+    setImageUrl("");
+    setFieldErrors((p) => ({ ...p, image: "" }));
   };
 
   const validate = () => {
@@ -78,16 +97,17 @@ const AddProduct = ({ onSuccess }) => {
     if (!categories.includes(product.category))
       errors.category = "Select a valid category";
 
+    // Validate image
+    if (imageMode === "upload" && !imageFile) {
+      errors.image = "Please upload an image";
+    } else if (imageMode === "url" && !imageUrl.trim()) {
+      errors.image = "Please enter an image URL";
+    }
+
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const clearImage = () => {
-    setProduct((p) => ({ ...p, image: null }));
-    setImagePreview(null);
-    setFileName("");
-    setFieldErrors((p) => ({ ...p, image: "" }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,7 +118,6 @@ const AddProduct = ({ onSuccess }) => {
       return;
     }
 
-    // ✅ MUST match backend middleware
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("❌ Token missing. Login again as admin.");
@@ -116,18 +135,21 @@ const AddProduct = ({ onSuccess }) => {
       formData.append("instock", String(product.instock));
       formData.append("category", product.category);
 
-      // ✅ MUST be 'myfile' because backend uses upload.single("myfile")
-      if (product.image) formData.append("myfile", product.image);
+      // Handle image based on mode
+      if (imageMode === "upload" && imageFile) {
+        formData.append("myfile", imageFile);
+      } else if (imageMode === "url" && imageUrl.trim()) {
+        formData.append("imageUrl", imageUrl.trim());
+      }
 
       const res = await axios.post(`${API_BASE}/api/products/addproduct`, formData, {
         headers: {
           "auth-token": token,
-          // Do NOT set Content-Type for FormData (axios will set boundary)
         },
         timeout: 15000,
       });
 
-      toast.success(" Product added!");
+      toast.success("✅ Product added!");
       onSuccess?.(res.data);
 
       // reset
@@ -138,10 +160,9 @@ const AddProduct = ({ onSuccess }) => {
         discount: "",
         instock: "",
         category: "",
-        image: null,
       });
-      setImagePreview(null);
-      setFileName("");
+      clearImage();
+      setImageMode("upload");
       setFieldErrors({});
     } catch (err) {
       console.error("AddProduct error:", err);
@@ -312,39 +333,102 @@ const AddProduct = ({ onSuccess }) => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Product Image
+              Product Image *
             </label>
+            <p className="text-xs text-gray-500 mb-3">Upload an image or paste an image URL</p>
 
-            {!imagePreview ? (
-              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center">
-                <FaImage className="text-gray-400 text-4xl mx-auto mb-3" />
-                <label className="cursor-pointer inline-block">
-                  <span className="px-6 py-2 rounded-xl bg-gray-900 text-white font-semibold hover:bg-black transition">
-                    Choose Image
-                  </span>
-                  <input type="file" accept="image/*" onChange={handleChange} className="hidden" />
-                </label>
+            {/* Toggle buttons */}
+            <div className="flex rounded-xl border border-gray-200 overflow-hidden mb-4 w-fit">
+              <button
+                type="button"
+                onClick={() => switchImageMode("upload")}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
+                  imageMode === "upload"
+                    ? "bg-gray-900 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                <FaUpload className="text-xs" /> Upload
+              </button>
+              <button
+                type="button"
+                onClick={() => switchImageMode("url")}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
+                  imageMode === "url"
+                    ? "bg-gray-900 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                <FaLink className="text-xs" /> URL
+              </button>
+            </div>
+
+            {/* URL Mode */}
+            {imageMode === "url" && (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={handleImageUrlChange}
+                  placeholder="https://example.com/product.jpg"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                />
+                {imagePreview && (
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      onError={() => setImagePreview(null)}
+                      className="w-full h-48 object-cover rounded-2xl border border-gray-100"
+                    />
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                )}
                 {fieldErrors.image && (
-                  <p className="mt-2 text-sm text-red-600">{fieldErrors.image}</p>
+                  <p className="text-sm text-red-600">{fieldErrors.image}</p>
                 )}
               </div>
-            ) : (
-              <div className="relative">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-64 object-cover rounded-2xl border border-gray-100"
-                />
-                <button
-                  type="button"
-                  onClick={clearImage}
-                  className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow"
-                  title="Remove image"
-                >
-                  <FaTimes />
-                </button>
-                <div className="mt-2 text-sm text-gray-600">📄 {fileName}</div>
-              </div>
+            )}
+
+            {/* Upload Mode */}
+            {imageMode === "upload" && (
+              !imagePreview ? (
+                <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center">
+                  <FaImage className="text-gray-400 text-4xl mx-auto mb-3" />
+                  <label className="cursor-pointer inline-block">
+                    <span className="px-6 py-2 rounded-xl bg-gray-900 text-white font-semibold hover:bg-black transition">
+                      Choose Image
+                    </span>
+                    <input type="file" accept="image/*" onChange={handleImageFile} className="hidden" />
+                  </label>
+                  {fieldErrors.image && (
+                    <p className="mt-2 text-sm text-red-600">{fieldErrors.image}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-64 object-cover rounded-2xl border border-gray-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    className="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow"
+                    title="Remove image"
+                  >
+                    <FaTimes />
+                  </button>
+                  <div className="mt-2 text-sm text-gray-600">📄 {fileName}</div>
+                </div>
+              )
             )}
           </div>
 

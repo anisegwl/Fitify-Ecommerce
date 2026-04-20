@@ -12,9 +12,12 @@ const OurProduct = () => {
 
   return (
     <div className="container mx-auto my-8 px-4">
-      <h3 className="mb-8 text-center text-2xl font-bold">
+      <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
         Our Products
       </h3>
+      <p className="text-gray-600 text-sm mt-1">
+        Explore our curated selection of top-tier fitness gear and apparel.
+      </p>
 
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.slice(0, 8).map((item) => (

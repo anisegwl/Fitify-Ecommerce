@@ -3,8 +3,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const Product = require("../model/Product");
+const Order = require("../model/Order");
 
 const fetchUser = require("../middleware/fetchuser");
+const fetchUserOptional = require("../middleware/fetchUserOptional");
 const adminOnly = require("../middleware/adminOnly");
 const { body, validationResult } = require("express-validator");
 
@@ -68,6 +70,111 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+/*
+================================
+PUBLIC/AUTH – RECOMMENDED PRODUCTS
+GET /api/products/recommendations
+================================
+*/
+router.get("/recommendations", fetchUserOptional, async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 20);
+    const fallbackProducts = await Product.find({})
+      .sort({ discount: -1, date: -1 })
+      .limit(limit);
+
+    if (!req.user?.id) {
+      return res.json(fallbackProducts);
+    }
+
+    const userOrders = await Order.find({
+      userId: req.user.id,
+      status: { $ne: "cancelled" },
+    })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    if (!userOrders.length) {
+      return res.json(fallbackProducts);
+    }
+
+    const purchasedProductIds = new Set();
+    const categoryWeight = {};
+    const titleTokens = new Set();
+    const stopWords = new Set([
+      "the",
+      "and",
+      "for",
+      "with",
+      "men",
+      "women",
+      "gym",
+      "fit",
+      "from",
+      "your",
+      "you",
+      "pack",
+      "set",
+    ]);
+
+    userOrders.forEach((order) => {
+      order.items.forEach((item) => {
+        const productId = String(item.productId);
+        purchasedProductIds.add(productId);
+
+        const words = String(item.title || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, " ")
+          .split(/\s+/)
+          .filter((w) => w.length > 2 && !stopWords.has(w));
+
+        words.forEach((w) => titleTokens.add(w));
+      });
+    });
+
+    const purchasedProducts = await Product.find({
+      _id: { $in: Array.from(purchasedProductIds) },
+    }).select("category");
+
+    purchasedProducts.forEach((p) => {
+      const key = String(p.category || "");
+      categoryWeight[key] = (categoryWeight[key] || 0) + 1;
+    });
+
+    const candidates = await Product.find({
+      _id: { $nin: Array.from(purchasedProductIds) },
+    }).limit(300);
+
+    const scored = candidates
+      .map((product) => {
+        const productTitleTokens = String(product.title || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, " ")
+          .split(/\s+/)
+          .filter(Boolean);
+
+        const tokenMatches = productTitleTokens.reduce((sum, token) => {
+          return sum + (titleTokens.has(token) ? 1 : 0);
+        }, 0);
+
+        const categoryScore = (categoryWeight[product.category] || 0) * 5;
+        const titleScore = tokenMatches * 2;
+        const discountScore = Math.min(Number(product.discount || 0) / 10, 3);
+        const score = categoryScore + titleScore + discountScore;
+
+        return { product, score };
+      })
+      .sort((a, b) => b.score - a.score || b.product.date - a.product.date)
+      .slice(0, limit)
+      .map((entry) => entry.product);
+
+    return res.json(scored.length ? scored : fallbackProducts);
+  } catch (error) {
+    console.error("Recommendation error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

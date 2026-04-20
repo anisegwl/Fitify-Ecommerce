@@ -43,6 +43,25 @@ const Gyms = () => {
     }
 
     switch (sortBy) {
+      case "ranking": {
+        const prices = list
+          .map((g) => Number(g.membership?.oneMonth || 0))
+          .filter((p) => p > 0);
+        const min = prices.length ? Math.min(...prices) : 0;
+        const max = prices.length ? Math.max(...prices) : 0;
+        const range = max - min;
+
+        list.sort((a, b) => {
+          const aPrice = Number(a.membership?.oneMonth || 0);
+          const bPrice = Number(b.membership?.oneMonth || 0);
+          const aAff = aPrice > 0 ? (range > 0 ? 1 - (aPrice - min) / range : 0.5) : 0;
+          const bAff = bPrice > 0 ? (range > 0 ? 1 - (bPrice - min) / range : 0.5) : 0;
+          const aScore = (Number(a.rating || 0) * 0.75) + (aAff * 5 * 0.25);
+          const bScore = (Number(b.rating || 0) * 0.75) + (bAff * 5 * 0.25);
+          return bScore - aScore;
+        });
+        break;
+      }
       case "ratingHigh":
         list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
@@ -102,6 +121,7 @@ const Gyms = () => {
                 className="w-full bg-transparent text-white outline-none text-sm"
               >
                 <option value="newest" className="text-black">Newest</option>
+                <option value="ranking" className="text-black">Best Ranked</option>
                 <option value="ratingHigh" className="text-black">Highest Rated</option>
                 <option value="priceLow" className="text-black">Price: Low to High</option>
                 <option value="priceHigh" className="text-black">Price: High to Low</option>
@@ -123,7 +143,7 @@ const Gyms = () => {
       <div className="max-w-6xl mx-auto px-4 py-10">
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
-            ❌ {error}
+             {error}
           </div>
         )}
 

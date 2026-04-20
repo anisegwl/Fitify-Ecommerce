@@ -60,10 +60,13 @@ const ProductState = ({ children }) => {
     products: [],
     cart: cartFromStorage(),
   });
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
 
   // loading/error for products
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [errorProducts, setErrorProducts] = useState("");
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [errorRecommendations, setErrorRecommendations] = useState("");
 
   // persist cart
   useEffect(() => {
@@ -111,6 +114,28 @@ const ProductState = ({ children }) => {
     }
   };
 
+  const getRecommendedProducts = async (limit = 8) => {
+    setLoadingRecommendations(true);
+    setErrorRecommendations("");
+    try {
+      const params = new URLSearchParams();
+      params.set("limit", String(limit));
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/recommendations?${params.toString()}`, {
+        headers: token ? { "auth-token": token } : {},
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch recommendations");
+      const data = await res.json();
+      setRecommendedProducts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setErrorRecommendations(err?.message || "Failed to load recommendations");
+      setRecommendedProducts([]);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
   // cart actions
   const addToCart = (product, qty = 1) => {
     if (!localStorage.getItem("token")) {
@@ -151,6 +176,10 @@ const ProductState = ({ children }) => {
         getAllProducts,
         loadingProducts,
         errorProducts,
+        recommendedProducts,
+        getRecommendedProducts,
+        loadingRecommendations,
+        errorRecommendations,
 
         // cart
         cart: state.cart,
