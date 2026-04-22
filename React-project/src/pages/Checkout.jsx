@@ -83,13 +83,13 @@ const Checkout = () => {
     return null;
   };
 
-  // ✅ BACKEND ORDER PLACE
+  //  BACKEND ORDER PLACE
   const placeOrder = async () => {
     if (placing) return;
 
     const err = validate();
     if (err) {
-      toast.error(`❌ ${err}`);
+      toast.error(` ${err}`);
       return;
     }
 
@@ -138,19 +138,19 @@ const Checkout = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(`❌ ${data?.message || "Order failed"}`);
+        toast.error(` ${data?.message || "Order failed"}`);
         setPlacing(false);
         return;
       }
 
-      toast.success("✅ Order placed successfully");
+      toast.success(" Order placed successfully");
       clearCart();
 
-      // ✅ recommended: go to success page
+      //  go to success page
       navigate(`/order-success/${data.orderId}`);
     } catch (e) {
       console.error(e);
-      toast.error("❌ Server not reachable");
+      toast.error("Server not reachable");
     } finally {
       setPlacing(false);
     }
@@ -245,7 +245,7 @@ const Checkout = () => {
                     value={form.fullName}
                     onChange={handleChange}
                     className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Biraj Shrestha"
+                    placeholder="NameofPerson"
                   />
                 </div>
 

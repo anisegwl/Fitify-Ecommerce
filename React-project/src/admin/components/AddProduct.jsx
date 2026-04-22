@@ -122,13 +122,13 @@ const AddProduct = ({ onSuccess }) => {
     if (loading) return;
 
     if (!validate()) {
-      toast.error("❌ Fix form errors first");
+      toast.error(" Fix form errors first");
       return;
     }
 
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.error("❌ Token missing. Login again as admin.");
+      toast.error("Token missing. Login again as admin.");
       return;
     }
 
@@ -162,7 +162,7 @@ const AddProduct = ({ onSuccess }) => {
         timeout: 15000,
       });
 
-      toast.success("✅ Product added!");
+      toast.success("Product added!");
       onSuccess?.(res.data);
 
       // reset
@@ -183,7 +183,7 @@ const AddProduct = ({ onSuccess }) => {
 
       const apiErrors = err?.response?.data?.errors;
       if (Array.isArray(apiErrors) && apiErrors.length > 0) {
-        toast.error(`❌ ${apiErrors.map((e) => e.msg).join(", ")}`);
+        toast.error(` ${apiErrors.map((e) => e.msg).join(", ")}`);
         return;
       }
 
@@ -195,7 +195,7 @@ const AddProduct = ({ onSuccess }) => {
           ? "Request timeout. Try again."
           : "Failed to add product.");
 
-      toast.error(`❌ ${msg}`);
+      toast.error(` ${msg}`);
     } finally {
       setLoading(false);
     }

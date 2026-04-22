@@ -7,32 +7,25 @@ import "react-toastify/dist/ReactToastify.css";
 const Signup = () => {
   const navigate = useNavigate();
 
-  const [credential, setCredential] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [credential, setCredential] = useState({ name: "", email: "", password: "" });
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setCredential((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const name = credential.name.trim();
     const email = credential.email.trim();
     const password = credential.password;
 
     if (!name || !email || !password) {
-      toast.error("⚠️ All fields are required");
+      toast.error(" All fields are required");
       return;
     }
     if (password.length < 5) {
-      toast.error("🔑 Password must be at least 5 characters");
+      toast.error(" Password must be at least 5 characters");
       return;
     }
 
@@ -43,164 +36,108 @@ const Signup = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-
       const data = await response.json();
-
       if (!response.ok || !data.authToken) {
-        toast.error(data.message || "❌ Signup failed");
+        toast.error(data.message || "Signup failed");
         return;
       }
-
       localStorage.setItem("token", data.authToken);
-      toast.success("✅ Account created successfully");
+      toast.success("Account created successfully");
       navigate("/login");
     } catch (err) {
       console.error(err);
-      toast.error("🚨 Server error. Please try again later");
+      toast.error("Server error. Please try again later");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* LEFT SIDE (Brand / Info) */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
-          <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-violet-500/30 blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
-
-          <div className="relative flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-slate-900 font-extrabold text-xl">
-              F
-            </div>
-            <div>
-              <h2 className="text-white font-semibold text-lg">Fitify</h2>
-              <p className="text-white/70 text-sm">Start your journey today</p>
-            </div>
-          </div>
-
-          <div className="relative mt-10">
-            <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-              Create your account
-            </h1>
-            <p className="mt-3 text-white/75 leading-relaxed max-w-md">
-              Track progress, stay consistent, and level up your fitness with a clean dashboard.
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm text-white/85">
-                ⚡ Fast
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm text-white/85">
-                🔒 Secure
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm text-white/85">
-                📈 Progress
-              </span>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Create an account</h1>
+          <p className="text-gray-600 mt-1">Sign up to start your journey</p>
         </div>
 
-        {/* RIGHT SIDE (Form) */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl">
-          <div>
-            <h3 className="text-white text-2xl font-semibold">Sign up</h3>
-            <p className="mt-1 text-white/70 text-sm">
-              Fill in your details to continue
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Name */}
             <div>
-              <label className="text-white/80 text-sm">Full name</label>
-              <div className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 focus-within:ring-4 focus-within:ring-violet-500/20 focus-within:border-violet-400/50 transition">
-                <FaUser className="text-white/70" />
+              <label className="text-sm font-semibold text-gray-700">Full name</label>
+              <div className="relative mt-2">
+                <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   name="name"
+                  placeholder="e.g. Person Name"
                   value={credential.name}
                   onChange={handleChange}
-                  placeholder="e.g. Biraj Shrestha"
                   autoComplete="name"
-                  className="w-full bg-transparent outline-none text-white placeholder:text-white/35"
+                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="text-white/80 text-sm">Email</label>
-              <div className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 focus-within:ring-4 focus-within:ring-violet-500/20 focus-within:border-violet-400/50 transition">
-                <FaEnvelope className="text-white/70" />
+              <label className="text-sm font-semibold text-gray-700">Email</label>
+              <div className="relative mt-2">
+                <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="email"
                   name="email"
+                  placeholder="you@example.com"
                   value={credential.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
                   autoComplete="email"
-                  className="w-full bg-transparent outline-none text-white placeholder:text-white/35"
+                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="text-white/80 text-sm">Password</label>
-              <div className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 focus-within:ring-4 focus-within:ring-violet-500/20 focus-within:border-violet-400/50 transition">
-                <FaLock className="text-white/70" />
+              <label className="text-sm font-semibold text-gray-700">Password</label>
+              <div className="relative mt-2">
+                <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type={showPwd ? "text" : "password"}
                   name="password"
+                  placeholder="Minimum 5 characters"
                   value={credential.password}
                   onChange={handleChange}
-                  placeholder="Minimum 5 characters"
                   autoComplete="new-password"
-                  className="w-full bg-transparent outline-none text-white placeholder:text-white/35"
+                  required
+                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPwd((s) => !s)}
-                  className="text-white/80 hover:text-white transition"
-                  aria-label={showPwd ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
                   {showPwd ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             </div>
 
-            {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-violet-500 to-cyan-400 text-slate-900 font-bold py-3 shadow-lg shadow-violet-500/20 hover:brightness-110 transition disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full rounded-xl bg-gray-900 text-white py-3 font-semibold hover:bg-black transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? "Creating..." : "Create account"}
             </button>
-
-            {/* Terms */}
-            <p className="text-xs text-white/70 leading-relaxed">
-              By signing up, you agree to our{" "}
-              <Link to="#" className="text-white underline underline-offset-4">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link to="#" className="text-white underline underline-offset-4">
-                Privacy Policy
-              </Link>
-              .
-            </p>
-
-            {/* Footer */}
-            <p className="text-sm text-white/80">
-              Already have an account?{" "}
-              <Link to="/login" className="text-white font-semibold underline underline-offset-4">
-                Log in
-              </Link>
-            </p>
           </form>
+        </div>
+
+        <div className="text-center mt-5 text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700">
+            Log in
+          </Link>
         </div>
       </div>
     </div>

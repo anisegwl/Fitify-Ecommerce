@@ -66,7 +66,7 @@ const AdminOrders = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(`❌ ${data?.message || "Failed to load orders"}`);
+        toast.error(` ${data?.message || "Failed to load orders"}`);
         setOrders([]);
         return;
       }
@@ -74,7 +74,7 @@ const AdminOrders = () => {
       setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
-      toast.error("❌ Server not reachable");
+      toast.error(" Server not reachable");
       setOrders([]);
     } finally {
       setLoading(false);
@@ -101,11 +101,11 @@ const AdminOrders = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(`❌ ${data?.message || "Failed to update status"}`);
+        toast.error(` ${data?.message || "Failed to update status"}`);
         return;
       }
 
-      toast.success("✅ Status updated");
+      toast.success(" Status updated");
 
       // Update local list
       setOrders((prev) =>
@@ -116,7 +116,7 @@ const AdminOrders = () => {
       setSelected((prev) => (prev?._id === orderId ? data.order : prev));
     } catch (err) {
       console.error(err);
-      toast.error("❌ Server not reachable");
+      toast.error(" Server not reachable");
     } finally {
       setUpdating(false);
     }
@@ -366,6 +366,9 @@ const AdminOrders = () => {
                       <div className="font-semibold text-gray-900">{it.title}</div>
                       <div className="text-sm text-gray-600">
                         Rs {money(it.price)} × {it.qty}
+                        {it.size ? (
+                          <div className="text-xs text-gray-500 mt-1">Size: {it.size}</div>
+                        ) : null}
                       </div>
                     </div>
                     <div className="font-bold text-gray-900">

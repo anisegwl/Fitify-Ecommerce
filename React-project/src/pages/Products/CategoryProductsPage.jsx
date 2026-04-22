@@ -71,7 +71,7 @@ const CategoryProductsPage = ({
   const handleAddToCart = (item) => {
     const success = addToCart(item, 1);
     if (success) {
-      toast.success("✅ Added to cart");
+      toast.success(" Added to cart");
     }
   };
 
@@ -138,7 +138,7 @@ const CategoryProductsPage = ({
       <div className="max-w-6xl mx-auto px-4 py-10">
         {errorProducts && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
-            ❌ {errorProducts}
+             {errorProducts}
           </div>
         )}
 

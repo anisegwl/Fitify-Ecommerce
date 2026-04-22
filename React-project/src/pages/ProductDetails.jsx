@@ -101,16 +101,16 @@ const ProductDetails = () => {
   const handleAdd = () => {
     if (!product) return;
     if (stock <= 0) {
-      toast.error("❌ Out of stock");
+      toast.error(" Out of stock");
       return;
     }
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-      toast.error("❌ Please select a size");
+      toast.error(" Please select a size");
       return;
     }
     const success = addToCart(product, qty, selectedSize);
     if (success) {
-      toast.success("✅ Added to cart");
+      toast.success(" Added to cart");
     }
   };
 

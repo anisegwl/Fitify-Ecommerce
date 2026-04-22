@@ -45,27 +45,27 @@ const Login = () => {
 
       const data = await resp.json();
 
-      // ✅ handle backend errors
+      
       if (!resp.ok) {
         toast.error(data?.message || data?.error || "Invalid credentials.");
         return;
       }
 
-      // ✅ must have token
+      
       if (!data?.authToken) {
         toast.error("Login failed: token not returned from server.");
         return;
       }
 
-      // ✅ IMPORTANT: store with same key everywhere
+      
       localStorage.setItem("token", data.authToken);
 
-      // ✅ update AuthContext (your context can also store user later)
+      
       login(data.authToken, data.user);
 
       toast.success("Login successful!");
 
-      // ✅ optional redirect based on role
+      
       if (data?.user?.role === "admin") {
         navigate("/admin", { replace: true });
       } else {

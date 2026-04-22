@@ -41,10 +41,10 @@ const AdminGymBookings = () => {
         { status: newStatus },
         { headers: { "auth-token": token } }
       );
-      toast.success("✅ Status updated");
+      toast.success(" Status updated");
       setBookings(prev => prev.map(b => b._id === id ? { ...b, status: newStatus } : b));
     } catch (err) {
-      toast.error("❌ Failed to update status");
+      toast.error(" Failed to update status");
       console.error(err);
     } finally {
       setUpdating(null);

@@ -23,12 +23,11 @@ const Home = () => {
         <RecommendedProducts />
       </div>
       
-      {/* Featured Products */}
       <div className="py-8">
         <OurProduct />
       </div>
 
-      {/* Featured Gyms */}
+      
       <GymSection />
 
       <Features />

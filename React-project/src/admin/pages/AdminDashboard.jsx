@@ -124,7 +124,7 @@ const AdminDashboard = () => {
     return Math.round(((lastTwo[1] - lastTwo[0]) / lastTwo[0]) * 100);
   }, [orders, revenueTrend]);
 
-  // Order status pie data
+  
   const orderStatusData = [
     { name: 'Pending',   value: orders.filter(o => o.status === 'pending').length,   color: '#FFA500' },
     { name: 'Confirmed', value: orders.filter(o => o.status === 'confirmed').length, color: '#3B82F6' },
@@ -140,6 +140,34 @@ const AdminDashboard = () => {
       .slice(0, 5),
     [products]
   );
+
+  // Best selling products (by quantity sold)
+  const bestSellingProducts = useMemo(() => {
+    const salesMap = {};
+    orders.forEach((order) => {
+      if (order.status === 'cancelled') return;
+      (order.items || []).forEach((item) => {
+        const prodId = item.productId?.toString();
+        if (prodId) {
+          if (!salesMap[prodId]) {
+            const prod = products.find(p => p._id?.toString() === prodId);
+            salesMap[prodId] = {
+              productId: prodId,
+              title: item.title || 'Product',
+              qtySold: 0,
+              instock: prod?.instock || 0,
+              price: prod?.price || 0
+            };
+          }
+          salesMap[prodId].qtySold += item.qty;
+        }
+      });
+    });
+    return Object.values(salesMap)
+      .filter(p => p.qtySold > 0)
+      .sort((a, b) => b.qtySold - a.qtySold)
+      .slice(0, 5);
+  }, [orders, products]);
 
   // Recent orders
   const recentOrders = orders.slice(0, 5);
@@ -317,12 +345,12 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Top Products */}
+          {/* Best Selling Products */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <FaBox className="text-gray-600" />
-                Top Products by Stock
+                Best Selling Products
               </h2>
             </div>
             <div className="overflow-x-auto">
@@ -330,39 +358,87 @@ const AdminDashboard = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Product</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Qty Sold</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Stock</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Price</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {topProducts.length > 0 ? (
-                    topProducts.map((product) => (
-                      <tr key={product._id} className="hover:bg-gray-50 transition-colors">
+                  {bestSellingProducts.length > 0 ? (
+                    bestSellingProducts.map((product) => (
+                      <tr key={product.productId} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 text-sm font-medium text-gray-900 line-clamp-1">
                           {product.title}
                         </td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                          {product.qtySold} units
+                        </td>
                         <td className="px-6 py-4 text-sm">
                           <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold ${
-                            product.instock > 10 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            product.instock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
-                            {product.instock}
+                            {product.instock > 0 ? `${product.instock} in stock` : 'Out of stock'}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                          Rs {product.price}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
-                        No products yet
+                        No sales yet
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        {/* Stock Status Table */}
+        <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <FaBox className="text-gray-600" />
+              Top Products by Current Stock
+            </h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Product</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Stock</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Price</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {topProducts.length > 0 ? (
+                  topProducts.map((product) => (
+                    <tr key={product._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900 line-clamp-1">
+                        {product.title}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold ${
+                          product.instock > 10 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {product.instock}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                        Rs {product.price}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
+                      No products yet
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

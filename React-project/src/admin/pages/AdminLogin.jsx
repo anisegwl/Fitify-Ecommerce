@@ -81,7 +81,7 @@ const AdminLogin = () => {
 
       // Block non-admins
       if (user.role !== "admin") {
-        toast.error("❌ Not authorized as admin");
+        toast.error(" Not authorized as admin");
         setLoading(false);
         return;
       }
@@ -95,16 +95,16 @@ const AdminLogin = () => {
       console.error("Admin login error:", error);
 
       if (error.code === "ECONNABORTED") {
-        toast.error("❌ Request timeout. Please try again.");
+        toast.error(" Request timeout. Please try again.");
       } else if (error.response) {
         // Server responded with error
         const message = error.response.data?.message || "Invalid admin credentials";
-        toast.error(`❌ ${message}`);
+        toast.error(` ${message}`);
       } else if (error.request) {
         // Request made but no response
-        toast.error("❌ Cannot connect to server. Please try again.");
+        toast.error("Cannot connect to server. Please try again.");
       } else {
-        toast.error("❌ An unexpected error occurred");
+        toast.error("An unexpected error occurred");
       }
     } finally {
       setLoading(false);

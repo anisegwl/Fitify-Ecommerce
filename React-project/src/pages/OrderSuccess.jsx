@@ -25,7 +25,7 @@ const OrderSuccess = () => {
         const data = await res.json();
 
         if (!res.ok) {
-          toast.error(`❌ ${data?.message || "Order not found"}`);
+          toast.error(` ${data?.message || "Order not found"}`);
           navigate("/", { replace: true });
           return;
         }
@@ -33,7 +33,7 @@ const OrderSuccess = () => {
         setOrder(data);
       } catch (err) {
         console.error(err);
-        toast.error("❌ Server not reachable");
+        toast.error(" Server not reachable");
         navigate("/", { replace: true });
       } finally {
         setLoading(false);

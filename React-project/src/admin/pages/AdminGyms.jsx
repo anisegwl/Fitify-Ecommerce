@@ -9,7 +9,7 @@ import { getGymMainImage } from "../../utils/gymImages";
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 const defaultImage = "https://via.placeholder.com/100x100.png?text=No+Image";
 
-// Only prepend API_BASE for local /uploads/ paths, not external URLs
+
 const resolveImage = (src) =>
   src?.startsWith("http") ? src : `${API_BASE}${src}`;
 
@@ -49,19 +49,19 @@ const AdminGyms = () => {
     setDeleteLoading(id);
     try {
       const token = localStorage.getItem("token");
-      if (!token) { toast.error("❌ Token missing. Login again."); return; }
+      if (!token) { toast.error(" Token missing. Login again."); return; }
       await axios.delete(`${API_BASE}/api/gyms/${id}`, {
         headers: { "auth-token": token },
         timeout: 10000,
       });
-      toast.success("✅ Gym deleted");
+      toast.success(" Gym deleted");
       await fetchGyms();
     } catch (error) {
       const msg =
         error?.response?.data?.message ||
         (error?.response?.status === 401 ? "Invalid token (login again)" : "") ||
         "Failed to delete gym";
-      toast.error(`❌ ${msg}`);
+      toast.error(`${msg}`);
     } finally {
       setDeleteLoading(null);
     }
@@ -74,7 +74,7 @@ const AdminGyms = () => {
       headers: { "auth-token": token },
       timeout: 10000,
     });
-    toast.success("✅ Gym updated");
+    toast.success("Gym updated");
     await fetchGyms();
     setEditingGym(null);
   };

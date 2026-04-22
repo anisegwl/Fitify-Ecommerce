@@ -8,6 +8,26 @@ import { FaEdit, FaTrash, FaBox, FaExclamationTriangle } from "react-icons/fa";
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 const defaultImage = "https://via.placeholder.com/100x100.png?text=No+Image";
 
+function resolveProductImage(product) {
+  const img = product?.image;
+
+  if (Array.isArray(img) && img.length > 0) {
+    const first = img[0];
+    if (!first) return defaultImage;
+    if (first.startsWith("http")) return first;
+    if (first.startsWith("/uploads/")) return `${API_BASE}${first}`;
+    return `${API_BASE}/uploads/${first}`;
+  }
+
+  if (typeof img === "string" && img) {
+    if (img.startsWith("http")) return img;
+    if (img.startsWith("/uploads/")) return `${API_BASE}${img}`;
+    return `${API_BASE}/uploads/${img}`;
+  }
+
+  return defaultImage;
+}
+
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -54,9 +74,9 @@ const AdminProducts = () => {
     setDeleteLoading(id);
 
     try {
-      const token = localStorage.getItem("token"); // ✅ FIXED
+      const token = localStorage.getItem("token"); 
       if (!token) {
-        toast.error("❌ Token missing. Login again.");
+        toast.error(" Token missing. Login again.");
         return;
       }
 
@@ -65,7 +85,7 @@ const AdminProducts = () => {
         timeout: 10000,
       });
 
-      toast.success("✅ Product deleted");
+      toast.success("Product deleted");
       await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -109,7 +129,7 @@ const AdminProducts = () => {
         }
       );
 
-      toast.success("✅ Product updated");
+      toast.success(" Product updated");
       await fetchProducts();
       setEditingProduct(null);
     } catch (error) {
@@ -120,7 +140,7 @@ const AdminProducts = () => {
         (error?.response?.status === 401 ? "Invalid token (login again)" : "") ||
         "Failed to update product";
 
-      toast.error(`❌ ${msg}`);
+      toast.error(`${msg}`);
 
       // Throw so modal can show error (if you use my improved modal)
       throw new Error(msg);
@@ -198,11 +218,7 @@ const AdminProducts = () => {
                     <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <img
-                          src={
-                            product.image?.length
-                              ? `${API_BASE}${product.image[0]}`
-                              : defaultImage
-                          }
+                          src={resolveProductImage(product)}
                           alt={product.title}
                           onError={(e) => (e.currentTarget.src = defaultImage)}
                           className="w-16 h-16 object-cover rounded-lg shadow-sm"
